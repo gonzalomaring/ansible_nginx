@@ -1,0 +1,6 @@
+- name: Install php-fpm
+  apt:
+    pkg: 
+      - php7.4-fpm
+      - php7.4
+

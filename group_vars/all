@@ -1,0 +1,14 @@
+# nginx
+virtualhosts:
+  - name: vhost1
+    datos:
+      nameserver: www.pagina1.org
+      documentroot: /srv/www/vhost1
+  - name: vhost2
+    datos:
+      nameserver: www.pagina2.org
+      documentroot: /srv/www/vhost2
+        
+virtualhosts2:
+  - name: vhost2
+

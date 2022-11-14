@@ -1,0 +1,67 @@
+- name: Install nginx
+  apt:
+    pkg: nginx
+  
+- name: Configuración de virtualhost
+  template: 
+    src: etc/nginx/sites-available/vhost.j2
+    dest: /etc/nginx/sites-available/{{item["name"]}}.conf
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - "{{virtualhosts}}"
+
+- name: Creación de document root
+  ansible.builtin.file:
+    path: /{{item["datos"]["documentroot"]}}
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  with_items:
+    - "{{virtualhosts}}"
+
+
+- name: ENlaces simbólicos
+  file:
+    src: /etc/nginx/sites-available/{{item["name"]}}.conf
+    dest: /etc/nginx/sites-enabled/{{item["name"]}}.conf
+    state: link
+    mode: 0755
+  with_items:
+    - "{{virtualhosts}}"
+  notify: restart nginx
+  
+
+- name: Copiado de indexs
+  copy:
+    src: index_{{item["name"]}}.html
+    dest: /{{item["datos"]["documentroot"]}}/index.html
+    owner: www-data
+    group: www-data
+    mode: 0644
+  with_items:
+    - "{{virtualhosts}}"
+
+
+- name: Copiando php.info
+  copy:
+    src: info.php
+    dest: /{{item["datos"]["documentroot"]}}/info.php
+    owner: www-data
+    group: www-data
+    mode: 0644
+  with_items:
+    - "{{virtualhosts}}"
+
+
+- name: Borrar virtualhosts
+  file:
+    dest: /etc/nginx/sites-enabled/{{item["name"]}}.conf
+    state: absent
+  with_items:
+    - "{{virtualhosts2}}"
+  notify: restart nginx
+    
+
